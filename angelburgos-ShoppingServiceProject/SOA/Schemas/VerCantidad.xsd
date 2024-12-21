@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<schema attributeFormDefault="unqualified"
+	elementFormDefault="qualified"
+	targetNamespace="http://xmlns.oracle.com/angelburgos_ShoppingServiceApplication/angelburgos_ShoppingServiceProject/VerCantidad"
+	xmlns="http://www.w3.org/2001/XMLSchema">
+	<element name="mainRequestMessage">
+		<complexType>
+			<sequence>
+				<element name="nombreArticulo" type="string"/>
+    <element name="cantidadSolicitada" type="decimal"/>
+   </sequence>
+		</complexType>
+	</element>
+	<element name="mainResponseMessage">
+		<complexType>
+			<sequence>
+    <element name="disponible" type="boolean"/>
+    <element name="cantidadDisponible" type="string"/>
+   </sequence>
+		</complexType>
+	</element>
+</schema>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<schema attributeFormDefault="unqualified"
+	elementFormDefault="qualified"
+	targetNamespace="http://xmlns.oracle.com/angelburgos_ShoppingServiceApplication/angelburgos_ShoppingServiceProject/Vendedor"
+	xmlns="http://www.w3.org/2001/XMLSchema">
+	<element name="VendedorRequestMessage">
+		<complexType>
+			<sequence>
+    <element name="precioOferta" type="decimal"/>
+   </sequence>
+		</complexType>
+	</element>
+	<element name="VendedorResponseMessage">
+		<complexType>
+			<sequence>
+				<element name="contraoferta" type="decimal"/>
+			</sequence>
+		</complexType>
+	</element>
+</schema>
