@@ -7,7 +7,6 @@
 		<complexType>
 			<sequence>
 				<element name="nombreArticulo" type="string"/>
-    <element name="cantidadSolicitada" type="decimal"/>
    </sequence>
 		</complexType>
 	</element>
@@ -15,7 +14,7 @@
 		<complexType>
 			<sequence>
     <element name="disponible" type="boolean"/>
-    <element name="cantidadDisponible" type="string"/>
+    <element name="precioOriginal" type="decimal"/>
    </sequence>
 		</complexType>
 	</element>

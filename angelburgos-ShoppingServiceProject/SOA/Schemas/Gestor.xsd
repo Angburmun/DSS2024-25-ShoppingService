@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <schema attributeFormDefault="unqualified"
 	elementFormDefault="qualified"
-	targetNamespace="http://xmlns.oracle.com/angelburgos_ShoppingServiceApplication/angelburgos_ShoppingServiceProject/Comprador"
+	targetNamespace="http://xmlns.oracle.com/angelburgos_ShoppingServiceApplication/angelburgos_ShoppingServiceProject/Gestor"
 	xmlns="http://www.w3.org/2001/XMLSchema">
-	<element name="CompradorRequestMessage">
+	<element name="GestorRequestMessage">
 		<complexType>
 			<sequence>
-    <element name="precioOriginal" type="decimal"/>
+				<element name="nombreProducto" type="string"/>
     <element name="precioOferta" type="decimal"/>
    </sequence>
 		</complexType>
 	</element>
-	<element name="CompradorResponseMessage">
+	<element name="GestorResponseMessage">
 		<complexType>
 			<sequence>
-				<element name="tratoAceptable" type="boolean"/>
+    <element name="precioFinal" type="decimal"/>
    </sequence>
 		</complexType>
 	</element>

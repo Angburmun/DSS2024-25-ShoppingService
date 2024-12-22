@@ -1,0 +1,161 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<!--
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Oracle JDeveloper BPEL Designer 
+  
+  Created: Sat Dec 21 18:16:46 CET 2024
+  Author:  angel
+  Type: BPEL 2.0 Process
+  Purpose: Synchronous BPEL Process
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+<process name="Gestor"
+               targetNamespace="http://xmlns.oracle.com/angelburgos_ShoppingServiceApplication/angelburgos_ShoppingServiceProject/Gestor"
+               xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+               xmlns:client="http://xmlns.oracle.com/angelburgos_ShoppingServiceApplication/angelburgos_ShoppingServiceProject/Gestor"
+               xmlns:ora="http://schemas.oracle.com/xpath/extension"
+               xmlns:ui="http://xmlns.oracle.com/soa/designer"
+               xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+         xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:ns1="http://xmlns.oracle.com/angelburgos_ShoppingServiceApplication/angelburgos_ShoppingServiceProject/VerCantidad"
+         xmlns:ns2="http://xmlns.oracle.com/angelburgos_ShoppingServiceApplication/angelburgos_ShoppingServiceProject/Comprador"
+         xmlns:ns3="http://xmlns.oracle.com/angelburgos_ShoppingServiceApplication/angelburgos_ShoppingServiceProject/Vendedor"
+         xmlns:oraext="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.ExtFunc"
+         xmlns:bpm="http://xmlns.oracle.com/bpmn20/extensions"
+         xmlns:xp20="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.Xpath20"
+         xmlns:ess="http://xmlns.oracle.com/scheduler" xmlns:hwf="http://xmlns.oracle.com/bpel/workflow/xpath"
+         xmlns:xref="http://www.oracle.com/XSL/Transform/java/oracle.tip.xref.xpath.XRefXPathFunctions"
+         xmlns:dvm="http://www.oracle.com/XSL/Transform/java/oracle.tip.dvm.LookupValue"
+         xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:xdk="http://schemas.oracle.com/bpel/extension/xpath/function/xdk"
+         xmlns:ids="http://xmlns.oracle.com/bpel/services/IdentityService/xpath"
+         xmlns:ldap="http://schemas.oracle.com/xpath/extension/ldap">
+
+    <import ui:processWSDL="true" namespace="http://xmlns.oracle.com/angelburgos_ShoppingServiceApplication/angelburgos_ShoppingServiceProject/Gestor" location="../WSDLs/Gestor.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"/>
+    <!-- 
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        PARTNERLINKS                                                      
+        List of services participating in this BPEL process               
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    --> 
+  <partnerLinks>
+    <!-- 
+      The 'client' role represents the requester of this service. It is 
+      used for callback. The location and correlation information associated
+      with the client role are automatically set using WS-Addressing.
+    -->
+    <partnerLink name="gestor_client" partnerLinkType="client:Gestor" myRole="GestorProvider"/>
+    <partnerLink name="vercantidad_client" partnerLinkType="ns1:VerCantidad" partnerRole="VerCantidadProvider"/>
+    <partnerLink name="comprador_client" partnerLinkType="ns2:Comprador" partnerRole="CompradorProvider"/>
+    <partnerLink name="vendedor_client" partnerLinkType="ns3:Vendedor" partnerRole="VendedorProvider"/>
+  </partnerLinks>
+
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      VARIABLES                                                        
+      List of messages and XML documents used within this BPEL process 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <variables>
+    <!-- Reference to the message passed as input during initiation -->
+    <variable name="inputVariable" messageType="client:GestorRequestMessage"/>
+
+    <!-- Reference to the message that will be returned to the requester-->
+    <variable name="outputVariable" messageType="client:GestorResponseMessage"/>
+    <variable name="InvokeVerCantidad_process_InputVariable" messageType="ns1:VerCantidadRequestMessage"/>
+    <variable name="InvokeVerCantidad_process_OutputVariable" messageType="ns1:VerCantidadResponseMessage"/>
+    <variable name="InvokeComprador_process_InputVariable" messageType="ns2:CompradorRequestMessage"/>
+    <variable name="InvokeComprador_process_OutputVariable" messageType="ns2:CompradorResponseMessage"/>
+    <variable name="InvokeVendedor_process_InputVariable" messageType="ns3:VendedorRequestMessage"/>
+    <variable name="InvokeVendedor_process_OutputVariable" messageType="ns3:VendedorResponseMessage"/>
+  </variables>
+
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     ORCHESTRATION LOGIC                                               
+     Set of activities coordinating the flow of messages across the    
+     services integrated within this business process                  
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <sequence name="main">
+
+    <!-- Receive input from requestor. (Note: This maps to operation defined in Gestor.wsdl) -->
+    <receive name="receiveInput" partnerLink="gestor_client" portType="client:Gestor" operation="process" variable="inputVariable" createInstance="yes"/>
+    <assign name="AssignVerCantidad">
+      <copy>
+        <from>$inputVariable.payload/client:nombreProducto</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InvokeVerCantidad_process_InputVariable.payload/ns1:nombreArticulo</to>
+      </copy>
+    </assign>
+    <invoke name="InvokeVerCantidad" bpelx:invokeAsDetail="no" partnerLink="vercantidad_client"
+            portType="ns1:VerCantidad" operation="process" inputVariable="InvokeVerCantidad_process_InputVariable"
+            outputVariable="InvokeVerCantidad_process_OutputVariable"/>
+    <if name="IfProductoDisponible">
+      <documentation>
+        <![CDATA[Disponible]]>
+      </documentation>
+      <condition>xp20:upper-case($InvokeVerCantidad_process_OutputVariable.payload/ns1:disponible)='TRUE'</condition>
+      <sequence name="Sequence2">
+        <assign name="AssignComprador">
+          <copy>
+            <from>$inputVariable.payload/client:precioOferta</from>
+            <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InvokeComprador_process_InputVariable.payload/ns2:precioOferta</to>
+          </copy>
+          <copy>
+            <from>$InvokeVerCantidad_process_OutputVariable.payload/ns1:precioOriginal</from>
+            <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InvokeComprador_process_InputVariable.payload/ns2:precioOriginal</to>
+          </copy>
+        </assign>
+        <invoke name="InvokeComprador" partnerLink="comprador_client"
+                portType="ns2:Comprador" operation="process" inputVariable="InvokeComprador_process_InputVariable"
+                outputVariable="InvokeComprador_process_OutputVariable" bpelx:invokeAsDetail="no"/>
+        <while name="WhileNoAceptable">
+          <condition>xp20:upper-case($InvokeComprador_process_OutputVariable.payload/ns2:tratoAceptable)='FALSE'</condition>
+          <sequence>
+            <assign name="CopiarPrecioOferta">
+              <copy>
+                <from>$InvokeComprador_process_InputVariable.payload/ns2:precioOferta</from>
+                <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:precioFinal</to>
+              </copy>
+            </assign>
+            <assign name="AssignVendedor">
+              <copy>
+                <from>$outputVariable.payload/client:precioFinal*1.1</from>
+                <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InvokeVendedor_process_InputVariable.payload/ns3:precioOferta</to>
+              </copy>
+            </assign>
+            <invoke name="InvokeVendedor" partnerLink="vendedor_client" portType="ns3:Vendedor" operation="process"
+                    inputVariable="InvokeVendedor_process_InputVariable"
+                    outputVariable="InvokeVendedor_process_OutputVariable" bpelx:invokeAsDetail="no"/>
+            <assign name="AssignContraoferta">
+              <copy>
+                <from>$InvokeVendedor_process_OutputVariable.payload/ns3:contraoferta</from>
+                <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InvokeComprador_process_InputVariable.payload/ns2:precioOferta</to>
+              </copy>
+            </assign><invoke name="InvokeComprador" partnerLink="comprador_client" portType="ns2:Comprador"
+                             operation="process" inputVariable="InvokeComprador_process_InputVariable"
+                             outputVariable="InvokeComprador_process_OutputVariable"
+                             xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+                             xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+                             bpelx:invokeAsDetail="no"/></sequence>
+        </while>
+        <assign name="AssignPrecioFinal">
+          <copy>
+            <from>$InvokeComprador_process_InputVariable.payload/ns2:precioOferta</from>
+            <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:precioFinal</to>
+          </copy>
+        </assign>
+      </sequence>
+      <else>
+        <documentation>
+          <![CDATA[No disponible]]>
+        </documentation>
+        <sequence name="Sequence1">
+          <throw name="ThrowNoDisponible" faultName="bpel:invalidExpressionValue" faultVariable="inputVariable"/>
+        </sequence>
+      </else>
+    </if>
+    <!-- Generate reply to synchronous request -->
+    <reply name="replyOutput" partnerLink="gestor_client" portType="client:Gestor" operation="process" variable="outputVariable"/>
+  </sequence>
+</process>

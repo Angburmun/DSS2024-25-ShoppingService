@@ -67,14 +67,13 @@
   -->
   <sequence name="main">
 
-    <!-- Receive input from requestor. (Note: This maps to operation defined in Vendedor.wsdl) -->
-    <receive name="receiveInput" partnerLink="vendedor_client" portType="client:Vendedor" operation="process" variable="inputVariable" createInstance="yes"/>
-    <assign name="AssignContraoferta">
+    <!-- Receive input from requestor. (Note: This maps to operation defined in Vendedor.wsdl) --><receive name="receiveInput" partnerLink="vendedor_client" portType="client:Vendedor" operation="process" variable="inputVariable" createInstance="yes"/>
+    <assign name="AssignContraoferta" xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable">
       <copy>
-        <from>$inputVariable.payload/client:precioOferta*0.9</from>
-        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:contraoferta</to>
+         <from>$inputVariable.payload/client:precioOferta*1.1</from>
+         <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:contraoferta</to>
       </copy>
-    </assign>
+   </assign>
     <!-- Generate reply to synchronous request -->
     <reply name="replyOutput" partnerLink="vendedor_client" portType="client:Vendedor" operation="process" variable="outputVariable"/>
   </sequence>

@@ -76,12 +76,12 @@
       <condition>xp20:upper-case($inputVariable.payload/client:nombreArticulo)='CAMISA'</condition>
       <assign name="AssignCamisa">
         <copy>
-          <from>7</from>
-          <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:cantidadDisponible</to>
-        </copy>
-        <copy>
           <from>'True'</from>
           <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:disponible</to>
+        </copy>
+        <copy>
+          <from>20</from>
+          <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:precioOriginal</to>
         </copy>
       </assign>
       <elseif>
@@ -95,8 +95,8 @@
             <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:disponible</to>
           </copy>
           <copy>
-            <from>2</from>
-            <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:cantidadDisponible</to>
+            <from>100</from>
+            <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:precioOriginal</to>
           </copy>
         </assign>
       </elseif>
@@ -111,8 +111,8 @@
             <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:disponible</to>
           </copy>
           <copy>
-            <from>2</from>
-            <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:cantidadDisponible</to>
+            <from>80</from>
+            <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:precioOriginal</to>
           </copy>
         </assign>
       </elseif>
@@ -124,6 +124,10 @@
           <copy>
             <from>'False'</from>
             <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:disponible</to>
+          </copy>
+          <copy>
+            <from>0</from>
+            <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:precioOriginal</to>
           </copy>
         </assign>
       </else>
